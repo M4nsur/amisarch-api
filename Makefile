@@ -24,7 +24,7 @@ migrate-create:
 		echo "Missing required parameter name, example: make migrate-create name=init"; \
 		exit 1; \
 	fi; \
-	docker compose run --rm amisarch-postgres-migrate \
+	docker compose run --rm --user $(shell id -u):$(shell id -g) amisarch-postgres-migrate \
 		create \
 		-ext sql \
 		-dir /migrations \
