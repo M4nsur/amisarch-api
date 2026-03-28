@@ -1,6 +1,5 @@
 include .env
 export
-
 export PROJECT_ROOT=$(shell pwd)
 
 env-up:
@@ -30,12 +29,15 @@ migrate-create:
 		-dir /migrations \
 		-seq \
 		$(name)
+	@if command -v chown > /dev/null 2>&1; then \
+		chown -R $(shell whoami) migrations/ 2>/dev/null || true; \
+	fi
 
 migrate-up:
-	@make migrate-action actiot=up
+	@make migrate-action action=up
 
 migrate-down:
-	@make migrate-action aciot=down
+	@make migrate-action action=down
 
 migrate-action:
 	@if [ -z "$(action)" ]; then \
@@ -46,3 +48,15 @@ migrate-action:
 		-path /migrations \
 		-database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@amisarch-postgres:5432/${POSTGRES_DB}?sslmode=disable \
 		$(action)
+
+seed:
+	@go run cmd/seed/main.go
+
+run:
+	@docker compose up -d app
+
+stop:
+	@docker compose down app
+
+logs:
+	@docker compose logs -f app
